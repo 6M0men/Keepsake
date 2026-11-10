@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1c2740">
+<link rel="icon" href="icon-192.png">
+<title>Keepsake – your folders</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef1f6;--card:#fff;--ink:#1c2740;--mute:#667089;--line:#d6dce8;--acc:#e0a100;--accink:#1c2740;--side:#1c2740;--sideink:#e8ecf5;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121826;--card:#1b2438;--ink:#e8ecf5;--mute:#9aa5be;--line:#2c3854;--side:#0d1220}}
+:root[data-theme="dark"]{--bg:#121826;--card:#1b2438;--ink:#e8ecf5;--mute:#9aa5be;--line:#2c3854;--side:#0d1220}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Bricolage Grotesque",system-ui,sans-serif}
+.app{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
+aside{background:var(--side);color:var(--sideink);padding:20px 14px;position:sticky;top:0;height:100vh;overflow:auto}
+aside h1{font-size:24px;font-weight:800;margin:0 8px 18px}
+.col{display:block;width:100%;padding:8px 10px;border:0;border-radius:8px;background:none;color:inherit;font:inherit;cursor:pointer;text-align:left}
+.col:hover{background:#ffffff14}.col.on{background:var(--acc);color:var(--accink);font-weight:600}
+.side-actions{margin-top:16px;display:grid;gap:6px}
+.ghost{background:none;border:1px dashed #ffffff55;color:inherit;border-radius:8px;padding:8px;font:inherit;cursor:pointer}
+main{padding:22px;max-width:1000px;width:100%}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+input,textarea,select{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:9px 11px;width:100%}
+.bar input{flex:1;min-width:160px;width:auto}
+button.pri{background:var(--acc);color:var(--accink);border:0;border-radius:8px;padding:9px 14px;font:inherit;font-weight:600;cursor:pointer}
+button.sec{background:none;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 12px;font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+h2{margin:0 0 14px;font-size:20px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.item{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.fold{cursor:pointer}.fold:hover{border-color:var(--acc)}
+.item img{width:100%;max-height:200px;object-fit:cover;display:block;cursor:zoom-in}
+.item .b{padding:12px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
+.item h3{margin:0;font-size:17px;line-height:1.25;word-break:break-word}
+.dom{color:var(--mute);font-size:13px;word-break:break-all}
+.note{border-left:3px solid var(--acc);padding-left:9px;font-size:15px;white-space:pre-wrap}
+.note.cl{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.note.cl.open{display:block;overflow:visible}
+.more{background:none;border:0;color:var(--mute);font:inherit;font-size:13px;cursor:pointer;padding:0;text-decoration:underline;align-self:flex-start}
+.tags{display:flex;gap:5px;flex-wrap:wrap}.tags span{background:var(--bg);border-radius:20px;padding:1px 9px;font-size:13px;color:var(--mute)}
+.lk{background:var(--bg);border:1px solid var(--acc);color:var(--ink);border-radius:20px;padding:1px 10px;font:inherit;font-size:13px;cursor:pointer;text-align:left}
+h2 .lk{font-size:16px;font-weight:600}
+.flash{outline:3px solid var(--acc);outline-offset:3px}
+.acts{display:flex;gap:8px;margin-top:auto;padding-top:6px}
+.acts a,.acts button{font:inherit;font-size:14px;color:var(--ink);background:none;border:1px solid var(--line);border-radius:6px;padding:3px 10px;cursor:pointer;text-decoration:none}
+.cmts{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:8px}
+.cm{display:flex;gap:8px;align-items:baseline;background:var(--bg);border-radius:8px;padding:6px 9px;font-size:14px}
+.cm span{flex:1;white-space:pre-wrap;word-break:break-word}.cm small{color:var(--mute);font-size:12px}
+.cm button{border:0;background:none;color:var(--mute);cursor:pointer;font-size:16px;line-height:1}
+.cf{display:flex;gap:6px}.cf input{padding:6px 9px;font-size:14px}.cf button{padding:6px 12px}
+.empty{border:2px dashed var(--line);border-radius:12px;padding:40px 20px;text-align:center;color:var(--mute)}
+dialog{border:0;border-radius:14px;padding:20px;width:min(520px,94vw);background:var(--card);color:var(--ink)}
+dialog::backdrop{background:#0008}
+dialog label{display:block;font-weight:600;font-size:14px;margin:12px 0 4px}
+.pk{display:flex;gap:8px;align-items:center;font-weight:400;margin:2px 0}.pk input{width:auto}
+.plist{max-height:150px;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:6px 8px;margin-top:6px}
+.prev{max-width:100%;max-height:160px;margin-top:8px;border-radius:8px}
+.row{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:8px;display:none;z-index:9}
+@media(max-width:700px){.app{grid-template-columns:1fr}aside{position:static;height:auto;max-height:220px}main{padding:16px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside>
+<h1>Keepsake</h1>
+<div id="cols"></div>
+<div class="side-actions">
+<button class="ghost" id="exp">Back up (export)</button>
+<button class="ghost" id="imp">Restore (import)</button>
+<input type="file" id="impf" accept=".json" hidden>
+</div>
+</aside>
+<main>
+<div class="bar">
+<input id="q" type="search" placeholder="Search everything…" aria-label="Search">
+<button class="sec" id="newFolder">+ Folder</button>
+<button class="sec" id="newNote">+ Note</button>
+<button class="pri" id="add">+ Save item</button>
+</div>
+<h2 id="title"></h2>
+<div class="grid" id="grid"></div>
+</main>
+</div>
+
+<dialog id="dlg">
+<h2 id="dt">Save something</h2>
+<label for="f_url">Link (optional)</label>
+<input id="f_url" placeholder="https://…">
+<label for="f_img">Image or screenshot (optional)</label>
+<input id="f_img" type="file" accept="image/*">
+<div class="dom">Tip: copy a screenshot and press Ctrl+V while this window is open.</div>
+<img id="prev" class="prev" alt="" hidden>
+<label for="f_title">Title</label>
+<input id="f_title" placeholder="What is it?">
+<label for="f_note">Why did you save it? How will you use it?</label>
+<textarea id="f_note" rows="3"></textarea>
+<label for="f_tags">Tags (separate with commas)</label>
+<input id="f_tags" placeholder="recipe, idea, study">
+<label for="f_col">Folder</label>
+<select id="f_col"></select>
+<div class="row"><button class="sec" id="cancel">Cancel</button><button class="pri" id="save">Save</button></div>
+</dialog>
+<dialog id="ndlg"><h2>Note</h2>
+<label for="n_title">Title (optional)</label><input id="n_title">
+<label for="n_body">Write your note</label><textarea id="n_body" rows="6"></textarea>
+<label for="n_col">Folder</label><select id="n_col"></select>
+<label for="n_f">Link to saved items</label><input id="n_f" placeholder="Filter your saved items…"><div id="n_list" class="plist"></div>
+<div class="dom">Tip: if your note mentions the title of a saved item, it is linked automatically.</div>
+<div class="row"><button class="sec" id="n_cancel">Cancel</button><button class="pri" id="n_save">Save note</button></div></dialog>
+<dialog id="big"><img id="bigimg" alt="" style="width:100%"><div class="row"><button class="sec" id="closebig">Close</button></div></dialog>
+<dialog id="adlg"><p id="a_msg" style="margin:0 0 10px;font-weight:600"></p><input id="a_in" aria-label="Name"><div class="row"><button class="sec" id="a_no">Cancel</button><button class="pri" id="a_ok">OK</button></div></dialog>
+<div id="toast" role="status"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const KEY="keepsake-v1";
+let S={folders:[],items:[],notes:[]},cur=null,editId=null,imgData=null,nEdit=null,nSel=new Set();
+function mig(d){d.folders=d.folders||(d.cols||[]).map(c=>({id:c.id,name:c.name,p:null}));delete d.cols;d.folders=d.folders.filter(f=>!(f.id==="c1"&&f.name==="Unsorted"));d.items=d.items||[];d.notes=d.notes||[];
+ const ids=new Set(d.folders.map(f=>f.id));[...d.items,...d.notes].forEach(x=>{if(!ids.has(x.col))x.col=null});return d}
+try{const r=localStorage.getItem(KEY);if(r)S=JSON.parse(r)}catch(e){}
+S=mig(S);
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(S));return true}catch(e){toast("Storage is full or blocked. Please back up now.");return false}}
+function toast(m){const t=$("toast");t.textContent=m;t.style.display="block";clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display="none",2800)}
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+function esc(s){const d=document.createElement("div");d.textContent=s;return d.innerHTML}
+function domain(u){try{return new URL(u).hostname.replace(/^www\./,"")}catch(e){return ""}}
+function fixUrl(u){u=u.trim();if(u&&!/^https?:\/\//i.test(u))u="https://"+u;return u}
+const itemName=i=>i.title||domain(i.url)||"Untitled";
+const kids=id=>S.folders.filter(f=>(f.p||null)===id);
+function path(id){const a=[];while(id){const f=S.folders.find(x=>x.id===id);if(!f)break;a.unshift(f);id=f.p||null}return a}
+function opts(sel){return `<option value="">Home (no folder)</option>`+(function w(p,d){return kids(p).map(f=>`<option value="${f.id}" ${f.id===sel?"selected":""}>${"\u00a0\u00a0".repeat(d)}${esc(f.name)}</option>`+w(f.id,d+1)).join("")})(null,0)}
+function tree(p,d){return kids(p).map(f=>`<button class="col ${cur===f.id?"on":""}" style="padding-left:${10+d*16}px" data-c="${f.id}">📁 ${esc(f.name)}</button>`+tree(f.id,d+1)).join("")}
+function where(x){return x.col?`<div class="dom">in ${path(x.col).map(f=>esc(f.name)).join(" / ")}</div>`:""}
+function ask(msg,def,ok){return new Promise(r=>{const d=$("adlg"),i=$("a_in"),txt=def!==null;$("a_msg").textContent=msg;i.hidden=!txt;i.value=txt?def:"";$("a_ok").textContent=ok||"OK";
+ const done=v=>{d.close();r(v)};
+ $("a_ok").onclick=()=>done(txt?i.value:true);$("a_no").onclick=()=>done(txt?null:false);
+ d.oncancel=e=>{e.preventDefault();done(txt?null:false)};i.onkeydown=e=>{if(e.key==="Enter")$("a_ok").click()};
+ d.showModal();if(txt)i.focus()})}
+const OPEN=new Set();
+function fitNotes(){document.querySelectorAll(".note.cl").forEach(n=>{const id=n.dataset.nid,o=OPEN.has(id);n.classList.toggle("open",o);
+ if(o||n.scrollHeight>n.clientHeight+1){const b=document.createElement("button");b.className="more";b.dataset.more=id;b.textContent=o?"Read less":"Read more";n.after(b)}})}
+function flash(id){const e=$(id);if(!e)return;e.scrollIntoView({block:"center"});e.classList.add("flash");setTimeout(()=>e.classList.remove("flash"),2200)}
+
+function backHtml(i){const ns=S.notes.filter(n=>(n.links||[]).includes(i.id));return ns.length?`<div class="tags">${ns.map(n=>`<button class="lk" data-gonote="${n.id}">Note: ${esc(n.title||"Untitled note")}</button>`).join("")}</div>`:""}
+function cmtHtml(i){return `<div class="cmts">${(i.cmts||[]).map(c=>`<div class="cm"><span>${esc(c.t)}</span><small>${new Date(c.d).toLocaleDateString()}</small><button data-delc="${i.id}|${c.id}" aria-label="Delete comment">×</button></div>`).join("")}<form class="cf" data-form="${i.id}"><input name="c" placeholder="Add a comment…" aria-label="Add a comment" autocomplete="off"><button class="sec" type="submit">Post</button></form></div>`}
+function itemCard(i,q){return `<article class="item" id="it-${i.id}">${i.img?`<img src="${i.img}" alt="${esc(i.title)}" data-big="${i.id}">`:""}
+ <div class="b"><h3>${esc(itemName(i))}</h3>${i.url?`<div class="dom">${esc(domain(i.url))}</div>`:""}${q?where(i):""}
+ ${i.note?`<div class="note cl" data-nid="${i.id}">${esc(i.note)}</div>`:""}
+ ${i.tags&&i.tags.length?`<div class="tags">${i.tags.map(t=>`<span>${esc(t)}</span>`).join("")}</div>`:""}
+ ${backHtml(i)}${cmtHtml(i)}<div class="acts">${i.url?`<a href="${esc(i.url)}" target="_blank" rel="noopener noreferrer">Open</a>`:""}<button data-edit="${i.id}">Edit</button><button data-del="${i.id}">Delete</button></div></div></article>`}
+function noteCard(n,q){const its=(n.links||[]).map(id=>S.items.find(i=>i.id===id)).filter(Boolean);
+ return `<article class="item" id="nt-${n.id}"><div class="b"><h3>📝 ${esc(n.title||"Untitled note")}</h3>${q?where(n):""}<div class="note cl" data-nid="${n.id}">${esc(n.body)}</div>${its.length?`<div class="tags">${its.map(i=>`<button class="lk" data-goitem="${i.id}">${esc(itemName(i))}</button>`).join("")}</div>`:""}<div class="acts"><button data-nedit="${n.id}">Edit</button><button data-ndel="${n.id}">Delete</button></div></div></article>`}
+
+function render(){
+ const q=$("q").value.toLowerCase().trim();
+ $("cols").innerHTML=`<button class="col ${cur===null?"on":""}" data-c="">🏠 Home</button>`+tree(null,0);
+ $("title").innerHTML=q?"Search results":[{id:"",name:"Home"},...path(cur)].map(f=>`<button class="lk" data-c="${f.id}">${esc(f.name)}</button>`).join(" / ")+(cur?` <button class="sec" id="ren" style="font-size:13px">Rename</button> <button class="sec" id="delc" style="font-size:13px">Delete folder</button>`:"");
+ const m=s=>!q||s.toLowerCase().includes(q),here=x=>q||(x.col||null)===cur;
+ const fs=(q?S.folders:kids(cur)).filter(f=>m(f.name));
+ const ns=S.notes.filter(n=>here(n)&&m((n.title||"")+" "+n.body)).sort((a,b)=>b.date-a.date);
+ const its=S.items.filter(i=>here(i)&&m([i.title,i.note,i.url,(i.tags||[]).join(" "),(i.cmts||[]).map(c=>c.t).join(" ")].join(" "))).sort((a,b)=>b.date-a.date);
+ const fc=f=>{const a=kids(f.id).length,b=S.notes.filter(n=>n.col===f.id).length,c=S.items.filter(i=>i.col===f.id).length;return `<article class="item fold" data-c="${f.id}"><div class="b"><h3>📁 ${esc(f.name)}</h3><div class="dom">${a} folders · ${b} notes · ${c} items</div></div></article>`};
+ const html=fs.map(fc).join("")+ns.map(n=>noteCard(n,q)).join("")+its.map(i=>itemCard(i,q)).join("");
+ $("grid").innerHTML=html||`<div class="empty" style="grid-column:1/-1">${q?"Nothing matches your search.":"This place is empty. Use “+ Folder” to organize, “+ Note” to write, or “+ Save item” to keep a link or image."}</div>`;
+ fitNotes();
+}
+
+function openDlg(id){
+ editId=id||null;const it=S.items.find(i=>i.id===id)||{};
+ $("dt").textContent=id?"Edit item":"Save something";
+ $("f_url").value=it.url||"";$("f_title").value=it.title||"";$("f_note").value=it.note||"";$("f_tags").value=(it.tags||[]).join(", ");$("f_img").value="";
+ $("f_col").innerHTML=opts(id?it.col:cur);imgData=it.img||null;showPrev();$("dlg").showModal();
+}
+function showPrev(){const p=$("prev");if(imgData){p.src=imgData;p.hidden=false}else p.hidden=true}
+function shrink(file){
+ const r=new FileReader();
+ r.onload=()=>{const im=new Image();im.onload=()=>{const mx=900,s=Math.min(1,mx/Math.max(im.width,im.height));
+  const c=document.createElement("canvas");c.width=im.width*s;c.height=im.height*s;c.getContext("2d").drawImage(im,0,0,c.width,c.height);
+  imgData=c.toDataURL("image/jpeg",.75);showPrev()};im.src=r.result};
+ r.readAsDataURL(file);
+}
+$("f_img").onchange=e=>{if(e.target.files[0])shrink(e.target.files[0])};
+document.addEventListener("paste",e=>{if(!$("dlg").open)return;for(const it of e.clipboardData.items)if(it.type.startsWith("image/")){shrink(it.getAsFile());toast("Screenshot added");break}});
+$("add").onclick=()=>openDlg();
+$("cancel").onclick=()=>$("dlg").close();
+$("save").onclick=()=>{
+ const url=fixUrl($("f_url").value),title=$("f_title").value.trim();
+ if(!url&&!imgData&&!title&&!$("f_note").value.trim()){toast("Add a link, an image, or a note first.");return}
+ const data={url,img:imgData,title,note:$("f_note").value.trim(),tags:$("f_tags").value.split(",").map(t=>t.trim()).filter(Boolean),col:$("f_col").value||null};
+ if(editId)Object.assign(S.items.find(i=>i.id===editId),data);else S.items.push({id:uid(),date:Date.now(),...data});
+ if(persist()){$("dlg").close();toast("Saved")}render();
+};
+
+function drawPick(){const f=$("n_f").value.toLowerCase();
+ $("n_list").innerHTML=S.items.filter(i=>!f||(itemName(i)+" "+domain(i.url)+" "+(i.tags||[]).join(" ")).toLowerCase().includes(f)).map(i=>`<label class="pk"><input type="checkbox" data-pick="${i.id}" ${nSel.has(i.id)?"checked":""}> ${esc(itemName(i))}</label>`).join("")||`<div class="dom">No saved items found.</div>`}
+function openNote(id){nEdit=id||null;const n=S.notes.find(x=>x.id===id)||{links:[]};
+ $("n_title").value=n.title||"";$("n_body").value=n.body||"";$("n_f").value="";$("n_col").innerHTML=opts(id?n.col:cur);nSel=new Set(n.links||[]);drawPick();$("ndlg").showModal()}
+$("n_f").oninput=drawPick;
+document.addEventListener("change",e=>{const p=e.target.dataset&&e.target.dataset.pick;if(p){e.target.checked?nSel.add(p):nSel.delete(p)}});
+$("n_cancel").onclick=()=>$("ndlg").close();
+$("n_save").onclick=()=>{const title=$("n_title").value.trim(),body=$("n_body").value.trim();
+ if(!title&&!body){toast("Write something first.");return}
+ const hay=(title+" "+body).toLowerCase();
+ S.items.forEach(i=>{const nm=(i.title||"").toLowerCase();if(nm.length>=3&&hay.includes(nm))nSel.add(i.id)});
+ const d={title,body,links:[...nSel],col:$("n_col").value||null};
+ if(nEdit)Object.assign(S.notes.find(x=>x.id===nEdit),d);else S.notes.push({id:uid(),date:Date.now(),...d});
+ if(persist()){$("ndlg").close();toast("Note saved")}render()};
+$("newNote").onclick=()=>openNote();
+
+$("newFolder").onclick=async()=>{const n=await ask("Name your new folder"+(cur?" (inside “"+path(cur).slice(-1)[0].name+"”)":"")+":","");if(n&&n.trim()){S.folders.push({id:uid(),name:n.trim(),p:cur});persist();render()}};
+document.addEventListener("click",e=>{
+ const t=e.target,c=t.closest("[data-c]");
+ if(c){cur=c.dataset.c||null;$("q").value="";render();return}
+ if(t.dataset.edit)openDlg(t.dataset.edit);
+ if(t.dataset.del){const id=t.dataset.del;ask("Delete this item?",null,"Delete").then(ok=>{if(ok){S.items=S.items.filter(i=>i.id!==id);persist();render()}})}
+ if(t.dataset.big){$("bigimg").src=S.items.find(i=>i.id===t.dataset.big).img;$("big").showModal()}
+ if(t.id==="closebig")$("big").close();
+ if(t.dataset.more){const id=t.dataset.more,n=document.querySelector(`.note[data-nid="${id}"]`),o=!OPEN.has(id);o?OPEN.add(id):OPEN.delete(id);n.classList.toggle("open",o);t.textContent=o?"Read less":"Read more"}
+ if(t.dataset.nedit)openNote(t.dataset.nedit);
+ if(t.dataset.ndel){const id=t.dataset.ndel;ask("Delete this note?",null,"Delete").then(ok=>{if(ok){S.notes=S.notes.filter(n=>n.id!==id);persist();render()}})}
+ if(t.dataset.goitem){const it=S.items.find(i=>i.id===t.dataset.goitem);cur=it.col||null;$("q").value="";render();flash("it-"+it.id)}
+ if(t.dataset.gonote){const n=S.notes.find(i=>i.id===t.dataset.gonote);cur=n.col||null;$("q").value="";render();flash("nt-"+n.id)}
+ if(t.dataset.delc){const [a,b]=t.dataset.delc.split("|"),it=S.items.find(i=>i.id===a);it.cmts=(it.cmts||[]).filter(c=>c.id!==b);persist();render()}
+ if(t.id==="ren"){const f=S.folders.find(x=>x.id===cur);ask("New name for this folder:",f.name,"Rename").then(n=>{if(n&&n.trim()){f.name=n.trim();persist();render()}})}
+ if(t.id==="delc"){const f=S.folders.find(x=>x.id===cur),fid=cur;ask("Delete the folder “"+f.name+"”? Everything inside moves up one level.",null,"Delete").then(ok=>{if(ok){const up=f.p||null;S.folders.forEach(x=>{if(x.p===fid)x.p=up});[...S.items,...S.notes].forEach(x=>{if(x.col===fid)x.col=up});S.folders=S.folders.filter(x=>x!==f);cur=up;persist();render()}})}
+});
+document.addEventListener("submit",e=>{const f=e.target.closest("[data-form]");if(!f)return;e.preventDefault();const v=f.c.value.trim();if(!v)return;const it=S.items.find(i=>i.id===f.dataset.form);(it.cmts=it.cmts||[]).push({id:uid(),t:v,d:Date.now()});persist();render();toast("Comment added")});
+$("q").oninput=render;
+$("exp").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:"application/json"}));a.download="keepsake-backup-"+new Date().toISOString().slice(0,10)+".json";document.body.appendChild(a);a.click();a.remove();toast("Backup file created")};
+$("imp").onclick=()=>$("impf").click();
+$("impf").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d.items)throw 0;ask("Replace everything here with this backup?",null,"Replace").then(ok=>{if(ok){S=mig(d);cur=null;persist();render();toast("Backup restored")}})}catch(x){toast("That file is not a Keepsake backup.")}};r.readAsText(f);e.target.value=""};
+render();
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
+</script>
+</body>
+</html>
